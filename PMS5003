@@ -1,6 +1,5 @@
-// Serial Port connections for PM2.5 Sensor
-#define RXD2 3 // To sensor TXD
-#define TXD2 1 // To sensor RXD
+#define RXD2 16 // To sensor TXD
+#define TXD2 17 // To sensor RXD
  
 void setup() {
   // our debugging output
