@@ -37,9 +37,9 @@ command to run if program contains helper info
 
 Contributors names and contact info
 
-Arav Sharma
-Isaac Amar
-Manhim Liu
+Arav Sharma <br>
+Isaac Amar <br>
+Manhim Liu <br>
 Jonas Margono
 
 ## Version History
