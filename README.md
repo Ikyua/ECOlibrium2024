@@ -1,1 +1,1 @@
-# ECOlibrium
+# ECOlibrium Remote Sensor Module
