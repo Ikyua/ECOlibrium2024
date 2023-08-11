@@ -1,0 +1,18 @@
+## Bill of Materials (BOM)
+
+| Item       | Description                   | Part Number       | Quantity |
+|------------|-------------------------------|-------------------|----------|
+| 1          | 20W Solar Panel               | N/A               | 1        |
+| 2          | HW318 Buck Converter          | BC-HW318          | 1        |
+| 3          | 3.7V 20000mAh Battery         | N/A               | 1        |
+| 4          | TPS2113A Switching IC         | IC-TPS2113A       | 1        |
+| 5          | MB102 Voltage Divider         | VD-MB102          | 1        |
+| 6          | ESP32-WROOM-32U Main Board    | MB-ESP32          | 1        |
+| 7          | Resistor 50Ω                  | R-RCP0603W50R0GEB | 1        |
+| 8          | Resistor 400Ω                 | R-RT1206BRD07400RL| 1        |
+| 9          | Resistor 1kΩ                  | R-RC0201FR-071KL  | 1        |
+| 10         | Capacitor 0.1μF               | C-0.1μF           | 1        |
+| 11         | Capacitor 1μF                 | C-1μF             | 1        |
+| 12         | Micro-USB Female Breakout     | USB-F-Breakout    | 1        |
+| 13         | USB-A Male Breakout           | USB-M-Breakout    | 1        |
+| 14         | Custom TPS2113A Board         | Custom-TPS-Board  | 1        |
