@@ -1,6 +1,7 @@
 # ECOlibrium Remote Sensor Module
 
-Simple overview of use/purpose.
+This project comprises two distinct sensor modules designed to monitor environmental conditions in both indoor and outdoor settings. By leveraging various sensors, the modules provide real-time data, ensuring a comprehensive understanding of environmental parameters in both contexts. <br>
+The indoor and outdoor modules share similarities in design, but differences exist in the functionality of some sensors.
 
 ## Description
 
