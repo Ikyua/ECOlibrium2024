@@ -6,7 +6,7 @@ Welcome to the Sensor Power Module repository! This README provides an overview 
 
 - `Loisaida Power Schematic.sch`: The main schematic file in a standard electronic design format (e.g., KiCad, Eagle, Altium).
 - `Loisaida Power Schematic.pdf`: A PDF version of the schematic for quick viewing and printing.
-- `Loisaida Power Schematic.bom`: Bill of Materials (BOM) detailing all components used in the schematic.
+- `Loisaida Power Schematic BOM.bom`: Bill of Materials (BOM) detailing all components used in the schematic.
 
 ## Table of Contents
 - [Introduction](#introduction)
