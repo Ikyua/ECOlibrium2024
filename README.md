@@ -20,7 +20,7 @@ Detailed explanations of the functionalities and associated libraries will be pr
 ### SCD40
 | ESP32 Pin | Sesnor Pin | Description |
 |:-:|:-:|:--|
-| `5V`(BUS) | `Vcc` | The PMS5003 runs off of 5V. |
+| `3.3V`(BUS) | `Vcc` | The SCD40 runs off of 5 and 3.3 volts, but we chose to use 3.3V |
 | `GND`(BUS)| `GND` | Ground |
 | `IO22` |  `SCL` | I2C clock line |
 | `IO21`| `SDA` | I2C data line |
