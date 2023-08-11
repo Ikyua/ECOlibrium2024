@@ -41,6 +41,7 @@ Two
 | `IO21`| `SDA` | I2C data line |
 | `DNC`| `SDO` | Ignore, Do not connect |
 | `DNC`| `CSB` | Ignore, Do not connect |
+### SEN55
 ### Dependencies
 
 * Describe any prerequisites, libraries, OS version, etc., needed before installing program.
