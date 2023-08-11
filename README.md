@@ -18,22 +18,29 @@ Detailed explanations of the functionalities and associated libraries will be pr
 ## Getting Started
 ### Wiring
 ### SCD40
-| ESP32 Pin | Sesnor Pin | Description |
+| ESP32 Pin | Sensor Pin | Description |
 |:-:|:-:|:--|
 | `3.3V`(BUS) | `Vcc` | The SCD40 runs off of 5 and 3.3 volts, but we chose to use 3.3V |
 | `GND`(BUS)| `GND` | Ground |
 | `IO22` |  `SCL` | I2C clock line |
 | `IO21`| `SDA` | I2C data line |
+### SEN55
+| ESP32 Pin | Sensor Pin | Description |
+|:-:|:-:|:--|
+| `5V`(BUS) | `Vcc` | The SEN55 runs off of 5V |
+| `GND`(BUS)| `GND` | Ground |
+| `IO22` |  `SCL` | I2C clock line |
+| `IO21`| `SDA` | I2C data line |<br>
+Refer to datasheets for pin numbers and their respective assignments if it is not specified
 ### PMS7003
-| ESP32 Pin | Sesnor Pin | Description |
+| ESP32 Pin | Sensor Pin | Description |
 |:-:|:-:|:--|
 | `5V`(BUS) | `Vcc` | The PMS5003 runs off of 5V. |
 | `GND`(BUS)| `GND` | Ground |
 | `IO22` |  `SCL` | I2C clock line |
 | `IO21`| `SDA` | I2C data line |
-Two 
 ### BME280/SGP41
-| ESP32 Pin | Sesnor Pin | Description |
+| ESP32 Pin | Sensor Pin | Description |
 |:-:|:-:|:--|
 | `3v3`(BUS) | `Vcc` | The BME280 runs off of 3.3V. |
 | `GND`(BUS)| `GND` | Ground |
@@ -41,8 +48,10 @@ Two
 | `IO21`| `SDA` | I2C data line |
 | `DNC`| `SDO` | Ignore, Do not connect |
 | `DNC`| `CSB` | Ignore, Do not connect |
-### SEN55
+
 ### Dependencies
+
+We developed the Sensor module in Arduino IDE version 1.8.19, since this version accommodated all of our libraries
 
 * Describe any prerequisites, libraries, OS version, etc., needed before installing program.
 * ex. Windows 10
