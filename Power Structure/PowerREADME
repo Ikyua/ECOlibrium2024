@@ -1,0 +1,98 @@
+# Sensor Power Module README
+
+Welcome to the Sensor Power Module repository! This README provides an overview of the components, features, and usage instructions for the Sensor Power Module, designed to provide a constant and uninterrupted power supply to sensor modules. The module is purpose-made for both indoor and outdoor applications, offering the flexibility to use a solar panel input or swap it out for a wall-plug USB input when needed.
+
+## Schematic Files
+
+- `Loisaida Power Schematic.sch`: The main schematic file in a standard electronic design format (e.g., KiCad, Eagle, Altium).
+- `Loisaida Power Schematic.pdf`: A PDF version of the schematic for quick viewing and printing.
+- `Loisaida Power Schematic.bom`: Bill of Materials (BOM) detailing all components used in the schematic.
+
+## Table of Contents
+- [Introduction](#introduction)
+- [Components](#components)
+- [Features](#features)
+- [Setup Instructions](#setup-instructions)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Introduction
+
+The Sensor Power Module is designed to ensure a reliable and constant power supply for sensor modules, making it suitable for various applications. Whether your sensor module is placed indoors or outdoors, this module has you covered. The solar panel input can be easily swapped out for a wall-plug USB input (Micro-USB) when needed. The battery backup provides a reserve of power that can last several days, ensuring uninterrupted operation even in challenging conditions.
+
+## Components
+
+The following components are essential for assembling the Sensor Power Module:
+
+- 20W Solar Panel (with Micro-USB output plug)
+- HW318 Buck Converter
+- Battery Charger
+- TPS2113A Switching ICs
+- MB102 Voltage Divider
+- ESP32-WROOM-32U Main Board
+- Resistors and Capacitors (as needed)
+- USB Breakout Boards (Micro-USB female, USB-A male) for connections
+
+## Features
+
+- **Solar Power Management:** The solar panel or wall-plug USB input (Micro-USB) safely powers connected devices while simultaneously charging the battery with excess power via the MB102.
+- **Battery Backup:** Battery backup ensures continuous operation during low solar power or nighttime, providing several days of power reserve for uninterrupted sensor operation.
+- **Pass-through Avoidance:** The TPS2113A allows for switching between solar panel input and battery input; this must not be condensed into solely solar energy charging the battery to power the components, as it adds more complexity and leads to battery degradation
+- **Voltage Management:** TPS2113A switching ICs automatically select the higher voltage between solar panel and battery output, providing uninterrupted power to connected modules.
+- **Voltage Divider:** The HW103 voltage divider generates 5V and 3.3V outputs for powering connected components, such as an ESP32.
+- **Expandability:** USB breakout boards simplify connections to components, including the solar panel with its built-in Micro-USB output plug.
+
+
+## Setup Instructions
+
+1. **Assemble Components:** Use provided schematics and component datasheets to correctly assemble the solar panel, MB102 buck converter, battery charger, switching ICs, voltage divider, and main board.
+
+2. **Wiring:** Follow schematics to connect components. Ensure proper insulation and short circuit protection.
+
+3. **Testing:** Thoroughly test the module under various conditions to ensure proper functionality and safety.
+
+## Usage
+
+Follow these steps to set up and use the Sensor Power Module:
+
+1. Connect the solar panel's Micro-USB output plug to the Micro-USB female breakout board.
+
+2. Wire the Micro-USB female breakout board's VBUS and GND pins to their corresponding ports on the MB102 buck converter.
+
+3. The MB102 buck converter charges the battery and supplies power to connected devices via a TPS2113 input pin.
+
+4. Connect the output pins of the MB102 buck converter: One set of output pins will go to the battery's input ports via an included USB-A to Micro-USB cable that attaches to a built-in USB output. The other set of output pins will connect to the TPS2113A via the adjacent output pinholes.
+
+5. Attach the battery output to the other TPS2113A input using the battery's USB-A male breakout board.
+
+6. The TPS2113A will automatically select the power source with the higher voltage—either the solar panel or the battery output—for uninterrupted operation.
+
+7. Connect the TPS2113A's output to the HW103 voltage divider.
+
+8. Wire the voltage divider's 5V and 3.3V outputs to the appropriate pins on your ESP32.
+
+9. Ensure that all components share a common ground to establish proper electrical reference.
+
+## Contributing to the Project
+
+Contributions to this project are highly encouraged! If you're interested in contributing, follow these steps:
+
+1. Fork the repository.
+
+2. Create a new branch for your contribution
+
+3. Implement your changes and thoroughly test them.
+
+4. Submit a pull request with a clear and detailed description of your changes.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+If you have any questions, suggestions, or require further assistance, please don't hesitate to reach out. We trust that the Sensor Power Module will enhance your sensor projects by providing reliable and uninterrupted power management.
+
+Author: Lawrence Zeng
+Contact: pg@loisaidalab.org
