@@ -4,7 +4,9 @@ This project comprises two distinct sensor modules designed to monitor environme
 The indoor and outdoor modules share similarities in design, but differences exist in the functionality of some sensors.
 
 ## Description
-
+### General WiFi/Web Server Functionality
+### Sensors Used for Indoor Module
+### Sensors Used for Outdoor Module
 An in-depth paragraph about your project and overview of use.
 
 ## Getting Started
