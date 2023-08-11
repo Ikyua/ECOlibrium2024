@@ -5,9 +5,15 @@ The indoor and outdoor modules share similarities in design, but differences exi
 
 ## Description
 ### General WiFi/Web Server Functionality
+The modules use the WiFiManager for seamless WiFi connection management, automatically connecting the module to available networks. For serving web content, ESPAsyncWebServer allows for asynchronous handling of web requests, improving the efficacy of the web interface. The data from the sensors is presented via a user-friendly HTML interface, enabling users to have clear insights into the environmental parameters being monitored.
 ### Sensors Used for Indoor Module
+SCD40: Measures carbon dioxide concentrations, crucial for monitoring indoor air quality and ventilation efficiency.<br>
+SEN55: measures particulate matter, humidity, temperature, VOCs (Volatile Organic compounds), and NOx (Nitrogen Oxide) to provide a clear picture of air quality.
 ### Sensors Used for Outdoor Module
-An in-depth paragraph about your project and overview of use.
+PMS5003: Measures varous sizes of particulate matter.<br>
+BME280: Measures temperature, humidity, and barometric pressure, and altitude.<br>
+SGP41: Measures VOCs and NOx, integrating with the BME280 to obtain essential temperature and humidity data for accurate algorithmic readings. <br>
+Detailed explanations of the functionalities and associated libraries will be provided below.
 
 ## Getting Started
 
