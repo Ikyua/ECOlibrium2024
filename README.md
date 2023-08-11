@@ -10,13 +10,37 @@ The modules use the WiFiManager for seamless WiFi connection management. This al
 SCD40: Measures carbon dioxide concentrations, crucial for monitoring indoor air quality and ventilation efficiency.<br>
 SEN55: measures particulate matter, humidity, temperature, VOCs (Volatile Organic compounds), and NOx (Nitrogen Oxide) to provide a clear picture of air quality.
 ### Sensors Used for Outdoor Module
-PMS5003: Measures varous sizes of particulate matter.<br>
+PMS7003: Measures varous sizes of particulate matter.<br>
 BME280: Measures temperature, humidity, and barometric pressure, and altitude.<br>
 SGP41: Measures VOCs and NOx, integrating with the BME280 to obtain essential temperature and humidity data for accurate algorithmic readings. <br>
 Detailed explanations of the functionalities and associated libraries will be provided below.
 
 ## Getting Started
-
+### Wiring
+### SCD40
+| ESP32 Pin | Sesnor Pin | Description |
+|:-:|:-:|:--|
+| `5V`(BUS) | `Vcc` | The PMS5003 runs off of 5V. |
+| `GND`(BUS)| `GND` | Ground |
+| `IO22` |  `SCL` | I2C clock line |
+| `IO21`| `SDA` | I2C data line |
+### PMS7003
+| ESP32 Pin | Sesnor Pin | Description |
+|:-:|:-:|:--|
+| `5V`(BUS) | `Vcc` | The PMS5003 runs off of 5V. |
+| `GND`(BUS)| `GND` | Ground |
+| `IO22` |  `SCL` | I2C clock line |
+| `IO21`| `SDA` | I2C data line |
+Two 
+### BME280/SGP41
+| ESP32 Pin | Sesnor Pin | Description |
+|:-:|:-:|:--|
+| `3v3`(BUS) | `Vcc` | The BME280 runs off of 3.3V. |
+| `GND`(BUS)| `GND` | Ground |
+| `IO22` |  `SCL` | I2C clock line |
+| `IO21`| `SDA` | I2C data line |
+| `DNC`| `SDO` | Ignore, Do not connect |
+| `DNC`| `CSB` | Ignore, Do not connect |
 ### Dependencies
 
 * Describe any prerequisites, libraries, OS version, etc., needed before installing program.
