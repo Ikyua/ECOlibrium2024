@@ -10,8 +10,10 @@ The modules use the WiFiManager for seamless WiFi connection management. This al
 SCD40: Measures carbon dioxide concentrations, crucial for monitoring indoor air quality and ventilation efficiency.<br>
 SEN55: measures particulate matter, humidity, temperature, VOCs (Volatile Organic compounds), and NOx (Nitrogen Oxide) to provide a clear picture of air quality.
 ### Sensors Used for Outdoor Module
-PMS7003: Measures varous sizes of particulate matter.<br>
-BME280: Measures temperature, humidity, and barometric pressure, and altitude.<br>
+PMS5003: Measures varous sizes of particulate matter. <br>
+PMS7003: Measures varous sizes of particulate matter (Interchangeable with the PMS5003). <br>
+BME280: Measures temperature, humidity, and barometric pressure, and altitude. <br>
+SHT31: Measures temperature and humidty (Interchangeable with the BME280). <br>
 SGP41: Measures VOCs and NOx, integrating with the BME280 to obtain essential temperature and humidity data for accurate algorithmic readings. <br>
 Detailed explanations of the functionalities and associated libraries will be provided below.
 
