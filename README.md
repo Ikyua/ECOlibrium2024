@@ -30,7 +30,8 @@ Detailed explanations of the functionalities and associated libraries will be pr
 | `5V`(BUS) | `Vcc` | The SEN55 runs off of 5V |
 | `GND`(BUS)| `GND` | Ground |
 | `IO22` |  `SCL` | I2C clock line |
-| `IO21`| `SDA` | I2C data line |<br>
+| `IO21`| `SDA` | I2C data line |
+
 Refer to datasheets for pin numbers and their respective assignments if it is not specified
 ### PMS7003
 | ESP32 Pin | Sensor Pin | Description |
