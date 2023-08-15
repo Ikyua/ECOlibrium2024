@@ -55,6 +55,46 @@ Refer to datasheets for pin numbers and their respective assignments if it is no
 ### Dependencies
 
 We developed the Sensor module in Arduino IDE version 1.8.19, since this version accommodated all of our libraries
+####Libraries
+```
+#include <WiFiManager.h> 
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+#include <NOxGasIndexAlgorithm.h>
+#include <SensirionI2CSgp41.h>
+#include <VOCGasIndexAlgorithm.h>
+#include <Wire.h>
+#include <time.h>
+#include "PMS.h"
+```
+These are the libraries used for the Outdoor module. ESPAsyncWebServer.h Must be downloaded as a .zip library <br>
+# How to Download and Install `.zip` Libraries in Arduino IDE
+
+Follow these steps to add `.zip` libraries to your Arduino environment:
+
+## 1. Download Library
+- Download the desired library in `.zip` format to your computer.
+
+## 2. Open Arduino IDE
+- Launch the Arduino software.
+
+## 3. Add Library
+- Navigate to: `Sketch` > `Include Library` > `Add .ZIP Library...`.
+- Browse and select the downloaded `.zip` file.
+- Click 'Open'.
+
+## 4. Verify Installation
+- Restart the Arduino IDE.
+- Check for the new library under: `File` > `Examples`.
+
+## 5. Use the Library
+- In your sketches, select: `Sketch` > `Include Library` > [Your Library Name].
+
+---
+
+Your library should now be successfully added to the Arduino IDE!
 
 * Describe any prerequisites, libraries, OS version, etc., needed before installing program.
 * ex. Windows 10
