@@ -71,7 +71,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <i class="fas fa-location-arrow" style="color:#0099ff;"></i>
   <span class="dht-labels">GPS Location:</span>
 </p>
-<div id="gpsOutput">Fetching...</div>
+<div id="gpsOutput">%GPSDATA%</div>
 </body>
 <script>
 setInterval(function ( ) {
@@ -85,27 +85,25 @@ setInterval(function ( ) {
   xhttp.send();
 }, 5000 );
 
-function fetchGPSData() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("gpsOutput").innerHTML = this.responseText;
-    }
-    if (this.readyState == 4 && this.status == 500) {
-      document.getElementById("gpsOutput").innerHTML = "Error fetching GPS data.";
-    }
-  };
-  xhttp.open("GET", "/gps", true);
-  xhttp.send();
-}
-fetchGPSData();
-setInterval(fetchGPSData, 10000);
+setInterval(function() {
+    location.reload();
+}, 10000);  // Reload the page every 10 seconds
 
 </script>
 </html>)rawliteral";
 
 String processor(const String &var) {
-    // ... [Same as before]
+    if (var == "SERIALOUTPUT") {
+        return serialBuffer;
+    }
+    if (var == "GPSDATA") {
+        if (gps.location.isValid()) {
+            return "Latitude: " + String(gps.location.lat(), 6) + ", Longitude: " + String(gps.location.lng(), 6);
+        } else {
+            return "Error: GPS not fixed yet.";
+        }
+    }
+    return String();
 }
 
 void setup() {
@@ -129,15 +127,5 @@ void loop() {
 }
 
 // ... [Your existing server routes]
-
-server.on("/gps", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String gpsData;
-    if (gps.location.isValid()) {
-        gpsData = "Latitude: " + String(gps.location.lat(), 6) + ", Longitude: " + String(gps.location.lng(), 6);
-        request->send(200, "text/plain", gpsData);
-    } else {
-        request->send(500, "text/plain", "Error: GPS not fixed yet.");
-    }
-});
 
 // ... [Your main function]
