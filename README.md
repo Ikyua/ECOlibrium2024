@@ -54,8 +54,83 @@ Refer to datasheets for pin numbers and their respective assignments if it is no
 
 ### Dependencies
 
-We developed the Sensor module in Arduino IDE version 1.8.19, since this version accommodated all of our libraries
-###Outdoor Module Libraries
+We developed the Sensor module in Arduino IDE version 1.8.19, since this version accommodated all of our libraries<br>
+# Connecting ESP32 to Arduino IDE
+
+Setting up the ESP32 with the Arduino IDE requires a few steps. This guide will walk you through the process.
+
+## 1. Installing the Arduino IDE
+
+Before you can program the ESP32, you need to install the Arduino IDE.
+
+- Download the Arduino IDE from the [official Arduino website](https://www.arduino.cc/en/Main/Software).
+
+## 2. Setting up the ESP32 Board Support
+
+The Arduino IDE doesn't come with support for the ESP32 by default. You have to add it manually.
+
+### Add the ESP32 Board URL to Arduino IDE
+
+- Open Arduino IDE.
+- Go to `File` > `Preferences`.
+- In the "Additional Boards Manager URLs" field, enter the following URL:
+  `https://dl.espressif.com/dl/package_esp32_index.json`
+- Click OK.
+
+### Install ESP32 Board Support
+
+- Go to `Tools` > `Board` > `Boards Manager`.
+- In the search bar, type "ESP32".
+- Look for "esp32 by Espressif Systems" and click on the Install button.
+
+### Select the ESP32 Dev Module
+
+- After installation, go to `Tools` > `Board`.
+- From the list, select `ESP32 Dev Module`.
+
+## 3. Installing Sensirion Drivers (if needed)
+
+If your computer doesn't recognize the ESP32, you might need drivers for the USB-to-Serial chip on the board.
+
+For the ESP32, the common chip is the CP210x from Silicon Labs.
+
+- [Download the drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers) from the Silicon Labs website.
+
+## 4. Verifying the Connection
+
+- Connect the ESP32 to your computer using a micro-USB cable.
+- In the Arduino IDE, go to `Tools` > `Port` and select the COM port the ESP32 is connected to. The exact number can vary.
+- You can now upload your sketches to the ESP32.
+
+# Installing `.zip` Libraries in Arduino IDE
+
+Some of these libraries might not be available directly via the Library Manager and need to be manually added using the `.zip` format.
+
+## 1. Download Library
+
+- First, download the desired library in `.zip` format onto your computer. 
+  > **Note:** For both modules, the `ESPAsyncWebServer.h` library must be downloaded as a `.zip` library.
+
+## 2. Open Arduino IDE
+
+- Launch the Arduino IDE software on your computer.
+
+## 3. Add the Library
+
+- Go to the menu and navigate to: `Sketch` > `Include Library` > `Add .ZIP Library...`.
+- A file dialog will open. Navigate to the location where you saved the downloaded `.zip` file.
+- Select the `.zip` file and click 'Open'.
+
+## 4. Confirm the Installation
+
+- Once the library is added, restart the Arduino IDE.
+- You can verify the installation by going to: `File` > `Examples`. The new library should be listed there.
+
+## 5. Utilize the Library in Your Projects
+
+- When you create or edit sketches, you can include the library by selecting: `Sketch` > `Include Library` > [Your Library Name], or include at the beginning of the code in the format below
+
+####Outdoor Module Libraries
 ```
 #include <WiFiManager.h> 
 #include <WiFi.h>
@@ -69,32 +144,7 @@ We developed the Sensor module in Arduino IDE version 1.8.19, since this version
 #include <time.h>
 #include "PMS.h"
 ```
-These are the libraries used for the Outdoor module. ESPAsyncWebServer.h Must be downloaded as a .zip library <br>
-# How to Download and Install `.zip` Libraries in Arduino IDE
 
-Follow these steps to add `.zip` libraries to your Arduino environment:
-
-## 1. Download Library
-- Download the desired library in `.zip` format to your computer.
-
-## 2. Open Arduino IDE
-- Launch the Arduino software.
-
-## 3. Add Library
-- Navigate to: `Sketch` > `Include Library` > `Add .ZIP Library...`.
-- Browse and select the downloaded `.zip` file.
-- Click 'Open'.
-
-## 4. Verify Installation
-- Restart the Arduino IDE.
-- Check for the new library under: `File` > `Examples`.
-
-## 5. Use the Library
-- In your sketches, select: `Sketch` > `Include Library` > [Your Library Name].
-
----
-
-Your library should now be successfully added to the Arduino IDE!
 
 * Describe any prerequisites, libraries, OS version, etc., needed before installing program.
 * ex. Windows 10
