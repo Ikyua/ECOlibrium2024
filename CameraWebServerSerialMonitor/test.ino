@@ -4,15 +4,8 @@
 #include <WiFiManager.h>
 #include <AsyncTCP.h>
 #include "ESPAsyncWebServer.h"
-#include <TinyGPS++.h>
-#include <HardwareSerial.h>
 
 AsyncWebServer server(82);
-
-#define RXD0 3  // GPIO3, IO3
-#define TXD0 1  // GPIO1, IO1
-TinyGPSPlus gps;
-HardwareSerial GPSSerial(1);
 
 const char *soft_ap_ssid = "ESP32-CAM";
 const char *soft_ap_password = "testpassword";
@@ -48,15 +41,6 @@ String getBufferContents() {
         current = (current + 1) % BUFFER_SIZE;
     }
     return result;
-}
-
-String readGPS() {
-  if (gps.location.isValid()) {
-    return String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6);
-  }
-  else {
-    return "INVALID";
-  }
 }
 
 void printAndBuffer(const String& message, bool newline = true) {
@@ -133,11 +117,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 <body>
   <h2>ESP32-CAM Webserver</h2>
 <p>
-  <i class="fas fa-location-arrow" style="color:#0099ff;"></i>
-  <span class="dht-labels">GPS Location:</span>
-</p>
-<div id="gpsOutput">%GPSDATA%</div>
-<p>
   <i class="fas fa-terminal" style="color:#ff6600;"></i>
   <span class="dht-labels">Serial Monitor Output:</span>
 </p>
@@ -150,16 +129,6 @@ setInterval(function ( ) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("gpsOutput").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/gpsdata", true);
-  xhttp.send();
-}, 5000 );
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
       document.getElementById("serialOutput").innerHTML = this.responseText;
     }
   };
@@ -168,16 +137,9 @@ setInterval(function ( ) {
 }, 5000 );
 </script>
 </html>)rawliteral";
-///
-
-
-///
 
 String processor(const String& var){
-  if (var == "GPSDATA") {
-    return readGPS();
-  }
-  else if(var == "SERIALOUTPUT"){
+  if(var == "SERIALOUTPUT"){
     return getBufferContents();
   }
   return String();
@@ -264,9 +226,6 @@ void setup() {
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
   });
-  server.on("/gpsdata", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", readGPS().c_str());
-  });
   server.on("/serial", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", getBufferContents().c_str());
   });
@@ -287,9 +246,5 @@ void loop() {
     filename += number;
     filename += ".jpg";
     takePhoto(filename);
-  }
-  while (GPSSerial.available()) {
-    gps.encode(GPSSerial.read());
-  }
   }
 }
