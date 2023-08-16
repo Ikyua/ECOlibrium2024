@@ -1,11 +1,11 @@
-# ECOlibrium Remote Sensor Module
+# ECOlibrium Remote Sensor Module (ESP32)
 
 This project comprises two distinct sensor modules designed to monitor environmental conditions in both indoor and outdoor settings. By leveraging various sensors, the modules provide real-time data, ensuring a comprehensive understanding of environmental parameters in both contexts. <br>
 The indoor and outdoor modules share similarities in design, but differences exist in the functionality of some sensors.
 
 ## Description
 ### General WiFi/Web Server Functionality
-The modules use the WiFiManager for seamless WiFi connection management. This allows the module to automatically connect to available networks when powered on. For serving web content, ESPAsyncWebServer allows for asynchronous handling of web requests, improving the efficacy of the web interface. The data from the sensors is presented via a user-friendly HTML interface, enabling users to have clear insights into the environmental parameters being monitored.
+Software for these modules were developed in Arduino IDE, as it is compatible with the ESP32. The modules use the WiFiManager for seamless WiFi connection management. This allows the module to automatically connect to available networks when powered on. For serving web content, ESPAsyncWebServer allows for asynchronous handling of web requests, improving the efficacy of the web interface. The data from the sensors is presented via a user-friendly HTML interface, enabling users to have clear insights into the environmental parameters being monitored.
 ### Sensors Used for Indoor Module
 SCD40: Measures carbon dioxide concentrations, crucial for monitoring indoor air quality and ventilation efficiency.<br>
 SEN55: measures particulate matter, humidity, temperature, VOCs (Volatile Organic compounds), and NOx (Nitrogen Oxide) to provide a clear picture of air quality.
