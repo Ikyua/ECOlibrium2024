@@ -130,7 +130,7 @@ Some of these libraries might not be available directly via the Library Manager 
 
 - When you create or edit sketches, you can include the library by selecting: `Sketch` > `Include Library` > [Your Library Name], or include at the beginning of the code in the format below
 
-###Outdoor Module Libraries
+### Outdoor Module Libraries
 ```
 #include <WiFiManager.h> 
 #include <WiFi.h>
@@ -144,7 +144,7 @@ Some of these libraries might not be available directly via the Library Manager 
 #include <time.h>
 #include "PMS.h"
 ```
-###Indoor Module Libraries
+### Indoor Module Libraries
 ```
 #include <WiFiManager.h> 
 #include <WiFi.h>
