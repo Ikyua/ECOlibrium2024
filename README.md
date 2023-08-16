@@ -55,7 +55,7 @@ Refer to datasheets for pin numbers and their respective assignments if it is no
 ### Dependencies
 
 We developed the Sensor module in Arduino IDE version 1.8.19, since this version accommodated all of our libraries
-####Libraries
+###Outdoor Module Libraries
 ```
 #include <WiFiManager.h> 
 #include <WiFi.h>
