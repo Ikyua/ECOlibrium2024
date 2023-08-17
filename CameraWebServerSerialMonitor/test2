@@ -1,41 +1,49 @@
-server.on("/photos", HTTP_GET, handleListImages);
-server.on("/view", HTTP_GET, handleGetImage); // This route will be used to view the actual images
+String newFilename = filename;
+int fileNumber = 1;
+
+while (SD_MMC.exists(newFilename)) {
+    fileNumber++;
+    newFilename = filename.substring(0, filename.lastIndexOf('_') + 1) + String(fileNumber, DEC) + ".jpg";
+}
 
 
-void handleListImages(AsyncWebServerRequest *request) {
-    String html = "<html><body><ul>";
 
-    File root = SD_MMC.open("/");
-    if (root) {
-        File file = root.openNextFile();
-        while (file) {
-            String fileName = file.name();
-            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+void loop() {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        if (SD_MMC.begin()) {
+            int nextPhotoNumber = 1;
+            while (SD_MMC.exists("/photo_" + String(nextPhotoNumber, DEC) + ".jpg")) {
+                nextPhotoNumber++;
             }
-            file = root.openNextFile();
+
+            String filename = "/photo_" + String(nextPhotoNumber, DEC) + ".jpg";
+            takePhoto(filename);
+            printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
+        } else {
+            // Handle SD card absence
+            printAndBuffer("SD card not available");
         }
     }
-    html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
 
-    request->send(200, "text/html", html);
-}
-
-void handleGetImage(AsyncWebServerRequest *request) {
-    if (request->hasArg("name")) {
-        String filename = "/" + request->arg("name");
-        if (SD_MMC.exists(filename)) {
-            AsyncWebServerResponse *response = request->beginResponse(SD_MMC, filename, "image/jpeg");
-            request->send(response);
-            return;
-        }
+    while (GPSSerial.available()) {
+        gps.encode(GPSSerial.read());
     }
-    request->send(404, "text/plain", "Image not found");
 }
 
 
 
-<p>
-    <i class="fas fa-images" style="color:#0099ff;"></i>
-    <span class="dht-labels"><a href="/photos">View Photos</a></span>
-</p>
+esp_err_t err = esp_camera_init(&config);
+if (err != ESP_OK) {
+    // Error handling
+}
+
+int nextPhotoNumber = 1;
+while (SD_MMC.exists("/photo_" + String(nextPhotoNumber, DEC) + ".jpg")) {
+    nextPhotoNumber++;
+}
+
+String filename = "/photo_" + String(nextPhotoNumber, DEC) + ".jpg";
+takePhoto(filename);
