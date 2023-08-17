@@ -62,8 +62,24 @@ void loop() {
 }
 
 void handleListImages(AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not Found");
+    String html = "<html><body><ul>";
+
+    File root = SD_MMC.open("/");
+    if (root) {
+        File file = root.openNextFile();
+        while (file) {
+            String fileName = file.name();
+            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+            }
+            file = root.openNextFile();
+        }
+    }
+    html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
+
+    request->send(200, "text/html", html);
 }
+
 
 void handleGetImage(AsyncWebServerRequest *request) {
     if (request->hasArg("name")) {
