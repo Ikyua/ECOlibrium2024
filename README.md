@@ -35,6 +35,8 @@ Detailed explanations of the functionalities and associated libraries will be pr
 | `IO21`| `SDA` | I2C data line |
 
 Refer to datasheets for pin numbers and their respective assignments if it is not specified
+## Outdoor Module 
+![image](https://github.com/Isaacamar/ECOlibrium/assets/113270099/028262cc-c490-4796-8d30-b34dddfed141)
 ### PMS7003
 | ESP32 Pin | Sensor Pin | Description |
 |:-:|:-:|:--|
