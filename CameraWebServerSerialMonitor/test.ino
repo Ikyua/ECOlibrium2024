@@ -175,7 +175,7 @@ String readGPS() {
     if (gps.location.isValid()) {
         return String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6);
     } else {
-        return "INVALID";
+        return "------";
     }
 }
 
