@@ -1,66 +1,62 @@
-server.on("/list", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String output = "<html><body>";
+String listFilesOnSD() {
     File root = SD_MMC.open("/");
+    String filelist = "[";
     File file = root.openNextFile();
-
-    while(file) {
-        String filename = file.name();
-        output += "<a href=\"/photo?name=" + filename + "\">" + filename + "</a><br>";
+    while (file) {
+        if (!file.isDirectory()) {
+            filelist += "\"" + String(file.name()) + "\",";
+        }
         file = root.openNextFile();
     }
-    
-    output += "</body></html>";
-    request->send(200, "text/html", output);
+    if (filelist.length() > 1) {
+        filelist.remove(filelist.length() - 1);  // remove last comma
+    }
+    filelist += "]";
+    return filelist;
+}
+
+// Add this to the `setup` function:
+server.on("/listphotos", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "application/json", listFilesOnSD().c_str());
 });
 
-server.on("/photo", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if(request->hasArg("name")) {
-        String filename = request->arg("name");
-        File file = SD_MMC.open(filename);
-        if(file) {
-            AsyncWebServerResponse *response = request->beginResponseStream("image/jpeg");
-            response->addHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
-            response->addHeader("Connection", "close");
-            response->setContentLength(file.size());
 
-            uint8_t buf[512];
-            while(file.available()) {
-                size_t s = file.read(buf, 512);
-                response->write(buf, s);
+
+<p>
+    <i class="fas fa-images" style="color:#4CAF50;"></i>
+    <span class="dht-labels">Photos on SD Card:</span>
+</p>
+<ul id="photoList"></ul>
+
+
+
+setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            var files = JSON.parse(this.responseText);
+            var listHtml = '';
+            for (var i = 0; i < files.length; i++) {
+                listHtml += '<li><a href="/getphoto?name=' + files[i] + '">' + files[i] + '</a></li>';
             }
-            request->send(response);
-            file.close();
-        } else {
-            request->send(404, "text/plain", "File not found");
+            document.getElementById("photoList").innerHTML = listHtml;
         }
-    } else {
-        request->send(400, "text/plain", "Bad request");
-    }
-});
+    };
+    xhttp.open("GET", "/listphotos", true);
+    xhttp.send();
+}, 5000);
 
-output += "<a href=\"/photo?name=" + filename + "\">" + filename + "</a> [<a href=\"/download?name=" + filename + "\">Download</a>]<br>";
 
-server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if(request->hasArg("name")) {
-        String filename = request->arg("name");
-        File file = SD_MMC.open(filename);
-        if(file) {
-            AsyncWebServerResponse *response = request->beginResponseStream("image/jpeg");
-            response->addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-            response->addHeader("Connection", "close");
-            response->setContentLength(file.size());
 
-            uint8_t buf[512];
-            while(file.available()) {
-                size_t s = file.read(buf, 512);
-                response->write(buf, s);
-            }
-            request->send(response);
-            file.close();
-        } else {
-            request->send(404, "text/plain", "File not found");
+// Add this to the `setup` function:
+server.on("/getphoto", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String filename;
+    if (request->hasParam("name")) {
+        filename = request->getParam("name")->value();
+        if (SD_MMC.exists(filename.c_str())) {
+            request->send(SD_MMC, filename.c_str(), "image/jpeg");
+            return;
         }
-    } else {
-        request->send(400, "text/plain", "Bad request");
     }
+    request->send(404, "text/plain", "File not found");
 });
