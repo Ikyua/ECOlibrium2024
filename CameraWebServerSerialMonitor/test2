@@ -1,62 +1,41 @@
-String listFilesOnSD() {
+server.on("/photos", HTTP_GET, handleListImages);
+server.on("/view", HTTP_GET, handleGetImage); // This route will be used to view the actual images
+
+
+void handleListImages(AsyncWebServerRequest *request) {
+    String html = "<html><body><ul>";
+
     File root = SD_MMC.open("/");
-    String filelist = "[";
-    File file = root.openNextFile();
-    while (file) {
-        if (!file.isDirectory()) {
-            filelist += "\"" + String(file.name()) + "\",";
+    if (root) {
+        File file = root.openNextFile();
+        while (file) {
+            String fileName = file.name();
+            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+            }
+            file = root.openNextFile();
         }
-        file = root.openNextFile();
     }
-    if (filelist.length() > 1) {
-        filelist.remove(filelist.length() - 1);  // remove last comma
-    }
-    filelist += "]";
-    return filelist;
+    html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
+
+    request->send(200, "text/html", html);
 }
 
-// Add this to the `setup` function:
-server.on("/listphotos", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "application/json", listFilesOnSD().c_str());
-});
+void handleGetImage(AsyncWebServerRequest *request) {
+    if (request->hasArg("name")) {
+        String filename = "/" + request->arg("name");
+        if (SD_MMC.exists(filename)) {
+            AsyncWebServerResponse *response = request->beginResponse(SD_MMC, filename, "image/jpeg");
+            request->send(response);
+            return;
+        }
+    }
+    request->send(404, "text/plain", "Image not found");
+}
 
 
 
 <p>
-    <i class="fas fa-images" style="color:#4CAF50;"></i>
-    <span class="dht-labels">Photos on SD Card:</span>
+    <i class="fas fa-images" style="color:#0099ff;"></i>
+    <span class="dht-labels"><a href="/photos">View Photos</a></span>
 </p>
-<ul id="photoList"></ul>
-
-
-
-setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var files = JSON.parse(this.responseText);
-            var listHtml = '';
-            for (var i = 0; i < files.length; i++) {
-                listHtml += '<li><a href="/getphoto?name=' + files[i] + '">' + files[i] + '</a></li>';
-            }
-            document.getElementById("photoList").innerHTML = listHtml;
-        }
-    };
-    xhttp.open("GET", "/listphotos", true);
-    xhttp.send();
-}, 5000);
-
-
-
-// Add this to the `setup` function:
-server.on("/getphoto", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String filename;
-    if (request->hasParam("name")) {
-        filename = request->getParam("name")->value();
-        if (SD_MMC.exists(filename.c_str())) {
-            request->send(SD_MMC, filename.c_str(), "image/jpeg");
-            return;
-        }
-    }
-    request->send(404, "text/plain", "File not found");
-});
