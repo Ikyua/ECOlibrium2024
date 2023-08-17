@@ -146,6 +146,10 @@ const char index_html[] PROGMEM = R"rawliteral(
     <div style="height:300px; overflow:auto; border:1px solid #ccc; padding:5px;">
         <pre id="serialOutput">%SERIALOUTPUT%</pre>
     </div>
+    <p>
+    <i class="fas fa-images" style="color:#0099ff;"></i>
+    <span class="dht-labels"><a href="/photos">View Photos</a></span>
+    </p>
 </body>
 <script>
     setInterval(function ( ) {
@@ -177,6 +181,37 @@ String readGPS() {
     } else {
         return "------";
     }
+}
+
+void handleListImages(AsyncWebServerRequest *request) {
+    String html = "<html><body><ul>";
+
+    File root = SD_MMC.open("/");
+    if (root) {
+        File file = root.openNextFile();
+        while (file) {
+            String fileName = file.name();
+            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+            }
+            file = root.openNextFile();
+        }
+    }
+    html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
+
+    request->send(200, "text/html", html);
+}
+
+void handleGetImage(AsyncWebServerRequest *request) {
+    if (request->hasArg("name")) {
+        String filename = "/" + request->arg("name");
+        if (SD_MMC.exists(filename)) {
+            AsyncWebServerResponse *response = request->beginResponse(SD_MMC, filename, "image/jpeg");
+            request->send(response);
+            return;
+        }
+    }
+    request->send(404, "text/plain", "Image not found");
 }
 
 String processor(const String& var){
@@ -277,6 +312,8 @@ void setup() {
   server.on("/serial", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", getBufferContents().c_str());
   });
+  server.on("/photos", HTTP_GET, handleListImages);
+  server.on("/view", HTTP_GET, handleGetImage); // This route will be used to view the actual images
   server.begin();
 }
 
