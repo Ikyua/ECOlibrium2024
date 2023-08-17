@@ -1,66 +1,3 @@
-#include <SD_MMC.h>
-#include "esp_camera.h"
-#include <WiFiManager.h>
-#include <AsyncTCP.h>
-#include "ESPAsyncWebServer.h"
-#include <TinyGPS++.h>
-
-AsyncWebServer server(82);
-
-const char *soft_ap_ssid = "ESP32-CAM";
-const char *soft_ap_password = "testpassword";
-
-#define MINUTES_BETWEEN_PHOTOS 1
-#define FLASH_PIN 4 
-
-// Global variables for non-blocking timer
-unsigned long previousMillis = 0;
-const long interval = MINUTES_BETWEEN_PHOTOS * 60 * 1000;
-
-// Circular buffer for Serial Output
-#define BUFFER_SIZE 2000
-char serialBuffer[BUFFER_SIZE];
-uint16_t bufferStart = 0;
-uint16_t bufferEnd = 0;
-
-// ... (camera configuration, GPS setup, buffer functions)
-
-bool startMicroSD() {
-    // ... (microSD initialization code)
-}
-
-void takePhoto(const String& filename) {
-    // ... (photo capture code with modified filename generation)
-}
-
-// ... (index_html content)
-
-String readGPS() {
-    // ... (GPS data reading code)
-}
-
-// ... (setup function without camera initialization and photo capturing)
-
-void loop() {
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-
-        int nextPhotoNumber = 1;
-        while (SD_MMC.exists("/photo_" + String(nextPhotoNumber, DEC) + ".jpg")) {
-            nextPhotoNumber++;
-        }
-
-        String filename = "/photo_" + String(nextPhotoNumber, DEC) + ".jpg";
-        takePhoto(filename);
-        printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
-    }
-
-    while (GPSSerial.available()) {
-        gps.encode(GPSSerial.read());
-    }
-}
-
 void handleListImages(AsyncWebServerRequest *request) {
     String html = "<html><body><ul>";
 
@@ -70,7 +7,7 @@ void handleListImages(AsyncWebServerRequest *request) {
         while (file) {
             String fileName = file.name();
             if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+                html += "<li><a href='/view?name=" + fileName + "'>Image " + fileName + "</a><img data-src='/view?name=" + fileName + "' class='lazy-load' width='100' height='75'></li>";
             }
             file = root.openNextFile();
         }
@@ -80,70 +17,48 @@ void handleListImages(AsyncWebServerRequest *request) {
     request->send(200, "text/html", html);
 }
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lazyImages = document.querySelectorAll('.lazy-load');
 
-void handleGetImage(AsyncWebServerRequest *request) {
-    if (request->hasArg("name")) {
-        String filename = "/" + request->arg("name");
-        if (SD_MMC.exists(filename)) {
-            AsyncWebServerResponse *response = request->beginResponse(SD_MMC, filename, "image/jpeg");
-            request->send(response);
-            return;
-        }
-    }
-    request->send(404, "text/plain", "Image not found");
-}
-
-String processor(const String& var){
-    if (var == "GPSDATA") {
-        return readGPS();
-    }
-    else if (var == "SERIALOUTPUT") {
-        return getBufferContents();
-    }
-    return String();
-}
-
-void setup() {
-    // ... (serial, GPS, SD card, WiFi setup, camera initialization)
-
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send_P(200, "text/html", index_html, processor);
-    });
-    
-    server.on("/gpsdata", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send_P(200, "text/plain", readGPS().c_str());
-    });
-
-    server.on("/photoList", HTTP_GET, [](AsyncWebServerRequest *request){
-        String html = "<ul>";
-
-        File root = SD_MMC.open("/");
-        if (root) {
-            File files[10];
-            int fileCount = 0;
-
-            File file = root.openNextFile();
-            while (file) {
-                if (file.isDirectory() || (!file.isDirectory() && (file.name().endsWith(".jpg") || file.name().endsWith(".jpeg")))) {
-                    if (fileCount < 10) {
-                        files[fileCount] = file;
-                        fileCount++;
-                    } else {
-                        file.close();
-                    }
+        var lazyLoad = function () {
+            lazyImages.forEach(function (image) {
+                if (image.getBoundingClientRect().top <= window.innerHeight && image.getBoundingClientRect().bottom >= 0 && getComputedStyle(image).display !== 'none') {
+                    image.src = image.dataset.src;
+                    image.classList.remove('lazy-load');
                 }
-                file = root.openNextFile();
-            }
+            });
 
-            for (int i = fileCount - 1; i >= 0; i--) {
-                String fileName = files[i].name();
-                html += "<li><a href='/view?name=" + fileName + "'><img src='" + fileName + "' loading='lazy'></a></li>";
-                files[i].close();
-            }
+            lazyImages = Array.prototype.filter.call(lazyImages, function (image) {
+                return image.classList.contains('lazy-load');
+            });
+        };
+
+        if ('IntersectionObserver' in window) {
+            var lazyImageObserver = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        var lazyImage = entry.target;
+                        lazyImage.src = lazyImage.dataset.src;
+                        lazyImage.classList.remove('lazy-load');
+                        lazyImageObserver.unobserve(lazyImage);
+                    }
+                });
+            });
+
+            lazyImages.forEach(function (lazyImage) {
+                lazyImageObserver.observe(lazyImage);
+            });
+        } else {
+            lazyLoad();
         }
-        html += "</ul>";
-        request->send(200, "text/html", html);
-    });
 
-    server.begin();
-}
+        if ('addEventListener' in window) {
+            window.addEventListener('scroll', lazyLoad);
+            window.addEventListener('resize', lazyLoad);
+        } else if ('attachEvent' in window) {
+            window.attachEvent('onscroll', lazyLoad);
+            window.attachEvent('onresize', lazyLoad);
+        }
+    });
+</script>
