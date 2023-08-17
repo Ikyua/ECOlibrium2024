@@ -3,47 +3,108 @@ int fileNumber = 1;
 
 while (SD_MMC.exists(newFilename)) {
     fileNumber++;
-    newFilename = filename.substring(0, filename.lastIndexOf('_') + 1) + String(fileNumber, DEC) + ".jpg";
+    newFilename = filename.substring(0, filename.lastIndexOf('_') + 1) + String(fileNumber, DEC);
+    newFilename += ".jpg";
+    if (fileNumber < 10) {
+        newFilename = filename.substring(0, filename.lastIndexOf('_') + 1) + "0" + String(fileNumber, DEC);
+        newFilename += ".jpg";
+    }
 }
 
-
-
-void loop() {
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-
-        if (SD_MMC.begin()) {
-            int nextPhotoNumber = 1;
-            while (SD_MMC.exists("/photo_" + String(nextPhotoNumber, DEC) + ".jpg")) {
-                nextPhotoNumber++;
+<script>
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("photoList").innerHTML = this.responseText;
             }
+        };
+        xhttp.open("GET", "/photoList", true);
+        xhttp.send();
+    }, 5000);
+</script>
 
-            String filename = "/photo_" + String(nextPhotoNumber, DEC) + ".jpg";
-            takePhoto(filename);
-            printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
-        } else {
-            // Handle SD card absence
-            printAndBuffer("SD card not available");
+server.on("/photoList", HTTP_GET, [](AsyncWebServerRequest *request){
+    String html = "<ul>";
+
+    File root = SD_MMC.open("/");
+    if (root) {
+        File file = root.openNextFile();
+        while (file) {
+            String fileName = file.name();
+            if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+            }
+            file = root.openNextFile();
         }
     }
+    html += "</ul>";
+    request->send(200, "text/html", html);
+});
 
-    while (GPSSerial.available()) {
-        gps.encode(GPSSerial.read());
+
+
+Copy code
+String newFilename = filename.substring(0, filename.lastIndexOf('_') + 1);
+if (fileNumber < 10) {
+    newFilename += "0";
+}
+newFilename += String(fileNumber, DEC) + ".jpg";
+
+
+<ul id="photoList">
+    <!-- Photo links will be dynamically inserted here -->
+</ul>
+
+
+
+<script>
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var photoList = document.getElementById("photoList");
+                photoList.innerHTML = this.responseText;
+                var images = photoList.getElementsByTagName("img");
+                for (var i = 0; i < images.length; i++) {
+                    images[i].setAttribute("loading", "lazy");
+                }
+            }
+        };
+        xhttp.open("GET", "/photoList", true);
+        xhttp.send();
+    }, 5000);
+</script>
+
+
+server.on("/photoList", HTTP_GET, [](AsyncWebServerRequest *request){
+    String html = "<ul>";
+
+    File root = SD_MMC.open("/");
+    if (root) {
+        File files[10]; // Store references to the last 10 files
+        int fileCount = 0;
+
+        File file = root.openNextFile();
+        while (file) {
+            if (file.isDirectory() || (!file.isDirectory() && (file.name().endsWith(".jpg") || file.name().endsWith(".jpeg")))) {
+                if (fileCount < 10) {
+                    files[fileCount] = file;
+                    fileCount++;
+                } else {
+                    // Close and unload the remaining files
+                    file.close();
+                }
+            }
+            file = root.openNextFile();
+        }
+
+        for (int i = fileCount - 1; i >= 0; i--) {
+            String fileName = files[i].name();
+            html += "<li><a href='/view?name=" + fileName + "'><img src='" + fileName + "' loading='lazy'></a></li>";
+            files[i].close(); // Close and unload the file after appending
+        }
     }
-}
-
-
-
-esp_err_t err = esp_camera_init(&config);
-if (err != ESP_OK) {
-    // Error handling
-}
-
-int nextPhotoNumber = 1;
-while (SD_MMC.exists("/photo_" + String(nextPhotoNumber, DEC) + ".jpg")) {
-    nextPhotoNumber++;
-}
-
-String filename = "/photo_" + String(nextPhotoNumber, DEC) + ".jpg";
-takePhoto(filename);
+    html += "</ul>";
+    request->send(200, "text/html", html);
+});
