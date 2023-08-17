@@ -1,30 +1,53 @@
+// Your existing code...
+
+int photoNumber = 0; // New variable for photo numbering
+
+void setup() {
+    // Your existing setup code...
+
+    // Rest of your existing setup code...
+}
+
+void loop() {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        photoNumber++;
+        String filename = "/photo_" + String(photoNumber) + ".jpg";  // Generate filename
+        takePhoto(filename);
+        printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
+    }
+
+    // Rest of your existing loop code...
+}
+
 void handleListImages(AsyncWebServerRequest *request) {
     String html = "<html><body><ul>";
 
     File root = SD_MMC.open("/");
     if (root) {
-        File files[10]; // Array to store the last 10 files
-        int fileCount = 0; // Count of valid image files
-
-        // Find the last 10 image files
+        String filenames[10];
+        int index = 0;
         File file = root.openNextFile();
         while (file) {
             String fileName = file.name();
             if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-                files[fileCount % 10] = file; // Store file in the circular buffer
-                fileCount++;
+                filenames[index] = fileName;
+                index++;
+                if (index >= 10) {
+                    break;
+                }
             }
             file = root.openNextFile();
         }
-
-        // Display the last 10 image files
-        for (int i = 0; i < min(fileCount, 10); i++) {
-            String fileName = files[(fileCount + i) % 10].name();
-            html += "<li><a href='/view?name=" + fileName + "'>" + fileName + "</a></li>";
+        for (int i = 0; i < index; i++) {
+            html += "<li><a href='/view?name=" + filenames[i] + "'>" + filenames[i] + "</a></li>";
         }
     }
-
     html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
 
     request->send(200, "text/html", html);
 }
+
+// Your existing code...
