@@ -1,104 +1,46 @@
-#include <SD_MMC.h>
-#include "esp_camera.h"
-#include <WiFiManager.h>
-#include <AsyncTCP.h>
-#include "ESPAsyncWebServer.h"
-#include <TinyGPS++.h>
+void loop() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
 
-AsyncWebServer server(82);
-
-const char *soft_ap_ssid = "ESP32-CAM";
-const char *soft_ap_password = "testpassword";
-
-#define MINUTES_BETWEEN_PHOTOS 1
-#define FLASH_PIN 4 
-
-// Global variables for non-blocking timer
-unsigned long previousMillis = 0;
-const long interval = MINUTES_BETWEEN_PHOTOS * 60 * 1000;
-
-// Circular buffer for Serial Output
-#define BUFFER_SIZE 2000
-char serialBuffer[BUFFER_SIZE];
-uint16_t bufferStart = 0;
-uint16_t bufferEnd = 0;
-
-#define RXD0 3
-#define TXD0 1
-TinyGPSPlus gps;
-HardwareSerial GPSSerial(1); // Use Hardware Serial 1
-
-void addToBuffer(const String& data) {
-    for (uint16_t i = 0; i < data.length(); i++) {
-        serialBuffer[bufferEnd] = data[i];
-        bufferEnd = (bufferEnd + 1) % BUFFER_SIZE;
-        if (bufferEnd == bufferStart) {
-            bufferStart = (bufferStart + 1) % BUFFER_SIZE;
-        }
-    }
-}
-
-String getBufferContents() {
-    String result = "";
-    uint16_t current = bufferStart;
-    while (current != bufferEnd) {
-        result += serialBuffer[current];
-        current = (current + 1) % BUFFER_SIZE;
-    }
-    return result;
-}
-
-void printAndBuffer(const String& message, bool newline = true) {
-    String timestamp = "[" + String(millis()) + " ms] ";
-    String output = timestamp + message;
-
-    if (newline) {
-        Serial.println(output);
-        addToBuffer(output + "\n");
-    } else {
-        Serial.print(output);
-        addToBuffer(output);
-    }
-}
-
-bool startMicroSD() {
-    // ... your existing code ...
+    static int number = 0;
+    number++;
+    String filename = "/photo_" + String(number) + ".jpg";  // Generate filename
+    takePhoto(filename);
+    printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
+  }
+  while (GPSSerial.available()) {
+    gps.encode(GPSSerial.read());
+  }
 }
 
 void takePhoto(const String& filename) {
-    // ... your existing code ...
-}
+  String newFilename = filename;
+  int fileNumber = 1;
 
-void setup() {
-    // ... your existing setup code ...
+  while (SD_MMC.exists(newFilename)) {
+    newFilename = filename.substring(0, filename.lastIndexOf('.')) + "_" + String(fileNumber) + ".jpg";
+    fileNumber++;
+  }
 
-    server.on("/photos", HTTP_GET, [](AsyncWebServerRequest *request){
-        String html = "<h2>Photos on SD Card</h2>";
-        File root = SD_MMC.open("/");
-        File file = root.openNextFile();
-        while(file){
-            if(file.isDirectory()){
-                html += "<p><a href='" + file.name() + "'>" + file.name() + "</a></p>";
-            }
-            file = root.openNextFile();
-        }
-        request->send(200, "text/html", html);
-    });
+  camera_fb_t *fb = esp_camera_fb_get();
+  if (!fb) {
+    printAndBuffer("Unable to take a photo");
+    return;
+  }
+  if (fb->format != PIXFORMAT_JPEG) {
+     printAndBuffer("Capture format not JPEG");
+     esp_camera_fb_return(fb);
+     return;
+  }
 
-    server.onNotFound([](AsyncWebServerRequest *request){
-        String path = request->url();
-        if (path.endsWith(".jpg")) {
-            File photoFile = SD_MMC.open(path, FILE_READ);
-            if(photoFile){
-                request->send(SD_MMC, path, "image/jpeg");
-                photoFile.close();
-            }
-        }
-    });
-
-    // ... your existing server setup ...
-}
-
-void loop() {
-    // ... your existing loop code ...
+  File file = SD_MMC.open(newFilename.c_str(), "w");
+  if (file) {
+    printAndBuffer("Saving " + newFilename);
+    file.write(fb->buf, fb->len);
+    file.close();
+  } else {
+    printAndBuffer("Unable to write " + newFilename);
+  }
+  esp_camera_fb_return(fb);
 }
