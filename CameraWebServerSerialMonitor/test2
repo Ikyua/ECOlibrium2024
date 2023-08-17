@@ -1,53 +1,60 @@
-// Your existing code...
-
-int photoNumber = 0; // New variable for photo numbering
-
-void setup() {
-    // Your existing setup code...
-
-    // Rest of your existing setup code...
-}
-
-void loop() {
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-
-        photoNumber++;
-        String filename = "/photo_" + String(photoNumber) + ".jpg";  // Generate filename
-        takePhoto(filename);
-        printAndBuffer(String(gps.location.lat(), 6) + ", " + String(gps.location.lng(), 6));
-    }
-
-    // Rest of your existing loop code...
-}
-
 void handleListImages(AsyncWebServerRequest *request) {
-    String html = "<html><body><ul>";
+    String filenames = "[";
 
     File root = SD_MMC.open("/");
     if (root) {
-        String filenames[10];
+        // Create an array to store filenames
+        String filenamesArray[10];
         int index = 0;
+        
+        // Iterate through files and store photo filenames
         File file = root.openNextFile();
         while (file) {
             String fileName = file.name();
             if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-                filenames[index] = fileName;
+                filenamesArray[index] = "\"" + fileName + "\"";
                 index++;
                 if (index >= 10) {
-                    break;
+                    break; // Stop after getting 10 filenames
                 }
             }
             file = root.openNextFile();
         }
-        for (int i = 0; i < index; i++) {
-            html += "<li><a href='/view?name=" + filenames[i] + "'>" + filenames[i] + "</a></li>";
-        }
+        filenames += joinStrings(filenamesArray, ","); // Join filenames with commas
     }
-    html += "</ul><br/><a href='/'>Back to main page</a></body></html>";
+    filenames += "]";
 
-    request->send(200, "text/html", html);
+    request->send(200, "application/json", filenames);
 }
 
-// Your existing code...
+
+<!-- Add this script section to your HTML -->
+<script>
+    function updatePhotosList() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var filenames = JSON.parse(this.responseText);
+                var photosList = document.getElementById("photosList");
+                photosList.innerHTML = ""; // Clear the previous list
+                for (var i = 0; i < filenames.length; i++) {
+                    var listItem = document.createElement("li");
+                    var link = document.createElement("a");
+                    link.href = "/view?name=" + filenames[i];
+                    link.textContent = filenames[i];
+                    listItem.appendChild(link);
+                    photosList.appendChild(listItem);
+                }
+            }
+        };
+        xhttp.open("GET", "/photos", true);
+        xhttp.send();
+    }
+    
+    // Update the photos list initially and then every 5 seconds
+    updatePhotosList();
+    setInterval(updatePhotosList, 5000);
+</script>
+
+<!-- Add this to your HTML where you want to display the photos list -->
+<ul id="photosList"></ul>
