@@ -18,7 +18,9 @@ SGP41: Measures VOCs and NOx, integrating with the BME280 to obtain essential te
 Detailed explanations of the functionalities and associated libraries will be provided below.
 
 ## Getting Started
-### Wiring
+## Wiring
+## Indoor Module
+![Screen Shot 2023-08-18 at 1 27 57 PM](https://github.com/Isaacamar/ECOlibrium/assets/113270099/cb76f0aa-1c4e-4d58-a1e9-a431ddacf54a)
 ### SCD40
 
 | ESP32 Pin | Sensor Pin | Description |
