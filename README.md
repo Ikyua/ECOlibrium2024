@@ -20,6 +20,7 @@ Detailed explanations of the functionalities and associated libraries will be pr
 ## Getting Started
 ### Wiring
 ### SCD40
+
 | ESP32 Pin | Sensor Pin | Description |
 |:-:|:-:|:--|
 | `3.3V`(BUS) | `Vcc` | The SCD40 runs off of 5 and 3.3 volts, but we chose to use 3.3V |
