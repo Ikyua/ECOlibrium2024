@@ -1,23 +1,20 @@
-
-//Ecolibrium Remote Sensor
-//Air Quality Monitor
-String serialBuffer = "";
-
-#include <WiFiManager.h> 
+#include <Wire.h>
 #include <WiFi.h>
-#include "ESPAsyncWebServer.h"
+#include <ESPAsyncWebServer.h>
 #include <SensirionI2CSen5x.h>
 #include <SensirionI2CScd4x.h>
-#include <Wire.h>
-#include <time.h>
+
+const char* ssid = "Syed Rayyan’s iPhone";
+const char* password = "rayyan123";
+
+const char* soft_ap_ssid = "ESP32_AP";
+const char* soft_ap_password = "your_AP_PASSWORD";
+
+AsyncWebServer server(80);
 SensirionI2CSen5x sen5x;
 SensirionI2CScd4x scd4x;
 
-const char *soft_ap_ssid = "IndoorModule2";
-const char *soft_ap_password = "testpassword";
-
-AsyncWebServer server(80);
-
+String serialBuffer = "";
 
 float massConcentrationPm1p0;
 float massConcentrationPm2p5;
@@ -153,200 +150,168 @@ String readNoxIndex() {
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
+  <title>ESP32 Air Quality Monitor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://kit.fontawesome.com/d91e44f906.js" crossorigin="anonymous"></script>
   <style>
-    html {
-     font-family: Arial;
-     display: inline-block;
-     margin: 0px auto;
-     text-align: center;
-    }
+    html { font-family: Arial; display: inline-block; text-align: center; }
     h2 { font-size: 3.0rem; }
     p { font-size: 3.0rem; }
     .units { font-size: 1.2rem; }
-    .dht-labels{
-      font-size: 1.5rem;
-      vertical-align:middle;
-      padding-bottom: 15px;
-    }
+    .dht-labels { font-size: 1.5rem; vertical-align:middle; padding-bottom: 15px; }
   </style>
 </head>
 <body>
-  <h2>ESP32 Air Quality Server</h2>
+  <h2>ESP32 Air Quality Monitor</h2>
   <p>
-    <i class="fas fa-smog" style="color:#000000;"></i> 
-    <span class="dht-labels">PM 1.0</span>
+    <span class="dht-labels">PM1.0:</span>
     <span id="pm1p0">%PM1P0%</span>
-    <sup class="units">ug/m3</sup>
   </p>
   <p>
-    <i class="fas fa-smog" style="color:#a0a0a0;"></i>
-    <span class="dht-labels">PM 2.5</span>
+    <span class="dht-labels">PM2.5:</span>
     <span id="pm2p5">%PM2P5%</span>
-    <sup class="units">ug/m3</sup>
   </p>
   <p>
-    <i class="fas fa-smog" style="color:#afafaf;"></i>
-    <span class="dht-labels">PM 4.0</span>
+    <span class="dht-labels">PM4.0:</span>
     <span id="pm4p0">%PM4P0%</span>
-    <sup class="units">ug/m3</sup>
   </p>
   <p>
-    <i class="fas fa-smog" style="color:#f0f0f0;"></i> 
-    <span class="dht-labels">PM 10.0</span>
+    <span class="dht-labels">PM10.0:</span>
     <span id="pm10p0">%PM10P0%</span>
-    <sup class="units">ug/m3</sup>
   </p>
   <p>
-    <i class="fas fa-project-diagram" style="color:#631fc4;"></i> 
-    <span class="dht-labels">Carbon Dioxide</span>
+    <span class="dht-labels">CO2:</span>
     <span id="co2">%CO2%</span>
-    <sup class="units">ppm</sup>
   </p>
   <p>
-    <i class="fas fa-tint" style="color:#00add6;"></i> 
-    <span class="dht-labels">Ambient Humidity</span>
+    <span class="dht-labels">Humidity:</span>
     <span id="ambienthumidity">%AMBIENTHUMIDITY%</span>
-    <sup class="units">&percnt;</sup>
   </p>
   <p>
-    <i class="fas fa-thermometer-half" style="color:#bada55;"></i>
-    <span class="dht-labels">Ambient Temperature</span>
+    <span class="dht-labels">Temperature:</span>
     <span id="ambienttemperature">%AMBIENTTEMPERATURE%</span>
-    <sup class="units">&deg;C</sup>
   </p>
   <p>
-    <i class="fas fa-lungs" style="color:#ffb6c1;"></i> 
-    <span class="dht-labels">Voc Index</span>
+    <span class="dht-labels">VOC Index:</span>
     <span id="vocindex">%VOCINDEX%</span>
-    <sup class="units">-</sup>
   </p>
   <p>
-    <i class="fas fa-grin-squint-tears" style="color:#9b870c;"></i> 
-    <span class="dht-labels">Nox Index</span>
+    <span class="dht-labels">NOx Index:</span>
     <span id="noxindex">%NOXINDEX%</span>
-    <sup class="units">-</sup>
   </p>
-  <p>
-  <i class="fas fa-terminal" style="color:#ff6600;"></i>
-  <span class="dht-labels">Serial Monitor Output:</span>
-</p>
-<div style="height:300px; overflow:auto; border:1px solid #ccc; padding:5px;">
-  <pre id="serialOutput">%SERIALOUTPUT%</pre>
-</div>
+  <div style="text-align: left;">
+    <pre id="serial-output">%SERIAL%</pre>
+  </div>
 </body>
 <script>
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("pm1p0").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/pm1p0", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("pm1p0").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/pm1p0", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("pm2p5").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/pm2p5", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("pm2p5").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/pm2p5", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("pm4p0").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/pm4p0", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("pm4p0").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/pm4p0", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("pm10p0").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/pm10p0", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("pm10p0").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/pm10p0", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("co2").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/co2", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("co2").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/co2", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("ambienthumidity").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/ambienthumidity", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("ambienthumidity").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/ambienthumidity", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("ambienttemperature").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/ambienttemperature", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("ambienttemperature").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/ambienttemperature", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("vocindex").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/vocindex", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("vocindex").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/vocindex", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("noxindex").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/noxindex", true);
-  xhttp.send();
-}, 5000 ) ;
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("noxindex").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/noxindex", true);
+    xhttp.send();
+  }, 5000);
 
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("serialOutput").innerHTML = this.responseText;
-    }
-  };
-  xhttp.open("GET", "/serial", true);
-  xhttp.send();
-}, 5000 );
-
+  setInterval(function () {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("serial-output").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("GET", "/serial", true);
+    xhttp.send();
+  }, 5000);
 </script>
 </html>)rawliteral";
 
@@ -397,43 +362,30 @@ String processor(const String& var){
   return String();
 }
 
-
-void setup(){
-// Connect to Wi-Fi
-  WiFi.mode(WIFI_AP_STA);
+void setup() {
   Serial.begin(115200);
-printAndBuffer("To connect to the WiFi network, follow these steps:");
-printAndBuffer("1. Open your device's WiFi settings.");
-printAndBuffer("2. Look for a network named 'AutoConnectAP'.");
-printAndBuffer("3. Connect to 'AutoConnectAP'. If it's password-protected, use 'password' as the password.");
-printAndBuffer("4. Wait until your device indicates that it has connected to the network.");
-printAndBuffer("5. Once connected, enter the following address in a web browser: http://192.168.1.218/");
 
-  // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
-WiFiManager wm;
-
-  bool res;
-
-  res = wm.autoConnect("AutoConnectAP","password"); // password protected ap
-
-  if(!res) {
-    printAndBuffer("Failed to connect");
-    // ESP.restart();
-  } 
-  else {
-    //if you get here you have connected to the WiFi    
-    printAndBuffer("connected...yeey :)");
+  // Try to connect to WiFi
+  WiFi.begin(ssid, password);
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED && attempts > 10) {
+    delay(1000);
+    Serial.print(".");
+    attempts++;
   }
-  WiFi.softAP(soft_ap_ssid, soft_ap_password);
-  //start sensors
-  printAndBuffer("ESP32 IP as soft AP: ");
-  printAndBuffer(WiFi.softAPIP().toString());
 
-printAndBuffer("Local network server:");
-printAndBuffer("http://",false);
-printAndBuffer(WiFi.localIP().toString());
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("Connected to WiFi");
+  } else {
+    Serial.println("Failed to connect to WiFi, starting AP mode");
+    WiFi.softAP(soft_ap_ssid, soft_ap_password);
+    Serial.print("AP IP address: ");
+    Serial.println(WiFi.softAPIP());
+  }
 
-//begin sensors
+  // Initialize sensors
+  // Your sensor initialization code here
+  //begin sensors
 
 Wire.begin();
 
@@ -528,14 +480,17 @@ server.on("/ambienttemperature", HTTP_GET, [](AsyncWebServerRequest *request){
   }
 });
 
-  // Start server
-  server.begin();
-printAndBuffer("Paste into web browser:");
-printAndBuffer("http://", false); // false indicates that we're not adding a newline
-printAndBuffer(WiFi.localIP().toString());
-}
- 
-void loop(){
 
-  delay(1000);
+  // Serve web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+
+  server.begin();
+}
+
+void loop() {
+  // Your main code here
+
+  delay(1000); // Example delay
 }
