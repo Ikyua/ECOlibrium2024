@@ -150,168 +150,201 @@ String readNoxIndex() {
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>ESP32 Air Quality Monitor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html { font-family: Arial; display: inline-block; text-align: center; }
-    h2 { font-size: 3.0rem; }
-    p { font-size: 3.0rem; }
-    .units { font-size: 1.2rem; }
-    .dht-labels { font-size: 1.5rem; vertical-align:middle; padding-bottom: 15px; }
-  </style>
+    <title>ESP32 Air Quality Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html {
+            font-family: Arial;
+            display: inline-block;
+            text-align: center;
+        }
+        h1 {
+            font-size: 4.0rem;
+        }
+        p {
+            font-size: 3.0rem;
+        }
+        .units {
+            font-size: 1.2rem;
+        }
+        .dht-labels {
+            font-size: 1.5rem;
+            vertical-align:middle;
+            padding-bottom: 15px;
+        }
+        button {
+            background-color: white;
+            border: none;
+            color: forestgreen;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 100px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: white;
+        }
+    </style>
 </head>
 <body>
-  <h2>ESP32 Air Quality Monitor</h2>
-  <p>
+<h1>ESP32 Air Quality Monitor</h1>
+<p>
     <span class="dht-labels">PM1.0:</span>
     <span id="pm1p0">%PM1P0%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">PM2.5:</span>
     <span id="pm2p5">%PM2P5%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">PM4.0:</span>
     <span id="pm4p0">%PM4P0%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">PM10.0:</span>
     <span id="pm10p0">%PM10P0%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">CO2:</span>
     <span id="co2">%CO2%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">Humidity:</span>
     <span id="ambienthumidity">%AMBIENTHUMIDITY%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">Temperature:</span>
     <span id="ambienttemperature">%AMBIENTTEMPERATURE%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">VOC Index:</span>
     <span id="vocindex">%VOCINDEX%</span>
-  </p>
-  <p>
+</p>
+<p>
     <span class="dht-labels">NOx Index:</span>
     <span id="noxindex">%NOXINDEX%</span>
-  </p>
-  <div style="text-align: left;">
-    <pre id="serial-output">%SERIAL%</pre>
-  </div>
+</p>
+<p style="text-align: center;">
+    <span id="serial-output">%SERIAL% </span>
+</p>
+
+<button id = "online-button"> Go Online</button>
+
 </body>
 <script>
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("pm1p0").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/pm1p0", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("pm1p0").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/pm1p0", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("pm2p5").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/pm2p5", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("pm2p5").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/pm2p5", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("pm4p0").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/pm4p0", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("pm4p0").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/pm4p0", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("pm10p0").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/pm10p0", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("pm10p0").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/pm10p0", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("co2").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/co2", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("co2").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/co2", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("ambienthumidity").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/ambienthumidity", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("ambienthumidity").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/ambienthumidity", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("ambienttemperature").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/ambienttemperature", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("ambienttemperature").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/ambienttemperature", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("vocindex").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/vocindex", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("vocindex").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/vocindex", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("noxindex").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/noxindex", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("noxindex").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/noxindex", true);
+        xhttp.send();
+    }, 5000);
 
-  setInterval(function () {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        document.getElementById("serial-output").innerHTML = this.responseText;
-      }
-    };
-    xhttp.open("GET", "/serial", true);
-    xhttp.send();
-  }, 5000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("serial-output").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/serial", true);
+        xhttp.send();
+    }, 5000);
 </script>
 </html>)rawliteral";
 
