@@ -1,11 +1,12 @@
 #include <Wire.h>
+#include <WiFiManager.h> 
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <SensirionI2CSen5x.h>
 #include <SensirionI2CScd4x.h>
 
-const char* ssid = "Syed Rayyan’s iPhone";
-const char* password = "rayyan123";
+const char* ssid = "";
+const char* password = "";
 
 const char* soft_ap_ssid = "ESP32_AP";
 const char* soft_ap_password = "your_AP_PASSWORD";
