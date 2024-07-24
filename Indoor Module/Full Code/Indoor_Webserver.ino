@@ -157,6 +157,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             font-family: Arial;
             display: inline-block;
             text-align: center;
+            text-decoration: none;
         }
         h1 {
             font-size: 4.0rem;
@@ -164,14 +165,12 @@ const char index_html[] PROGMEM = R"rawliteral(
         p {
             font-size: 3.0rem;
         }
-        .units {
-            font-size: 1.2rem;
-        }
-        .dht-labels {
+        p.dht-labels {
             font-size: 1.5rem;
-            vertical-align:middle;
-            padding-bottom: 15px;
+            vertical-align: middle;
+            padding: 15px 15px;
         }
+
         button {
             background-color: white;
             border: none;
@@ -184,54 +183,82 @@ const char index_html[] PROGMEM = R"rawliteral(
             margin: 4px 2px;
             cursor: pointer;
         }
-
         button:hover {
-            background-color: white;
+            background-color: lightcoral;
+        }
+        .span {
+            font-size: 100px;
         }
     </style>
 </head>
 <body>
 <h1>ESP32 Air Quality Monitor</h1>
-<p>
-    <span class="dht-labels">PM1.0:</span>
-    <span id="pm1p0">%PM1P0%</span>
-</p>
-<p>
-    <span class="dht-labels">PM2.5:</span>
-    <span id="pm2p5">%PM2P5%</span>
-</p>
-<p>
-    <span class="dht-labels">PM4.0:</span>
-    <span id="pm4p0">%PM4P0%</span>
-</p>
-<p>
-    <span class="dht-labels">PM10.0:</span>
-    <span id="pm10p0">%PM10P0%</span>
-</p>
-<p>
-    <span class="dht-labels">CO2:</span>
-    <span id="co2">%CO2%</span>
-</p>
-<p>
-    <span class="dht-labels">Humidity:</span>
-    <span id="ambienthumidity">%AMBIENTHUMIDITY%</span>
-</p>
-<p>
-    <span class="dht-labels">Temperature:</span>
-    <span id="ambienttemperature">%AMBIENTTEMPERATURE%</span>
-</p>
-<p>
-    <span class="dht-labels">VOC Index:</span>
-    <span id="vocindex">%VOCINDEX%</span>
-</p>
-<p>
-    <span class="dht-labels">NOx Index:</span>
-    <span id="noxindex">%NOXINDEX%</span>
-</p>
-<p style="text-align: center;">
-    <span id="serial-output">%SERIAL% </span>
-</p>
+<div class = "first-box">
+    <div class="box">
+        <p>
+            <span class="dht-labels">PM1.0:</span>
+            <span id="pm1p0">%PM1P0%</span>
+        </p>
+    </div>
+    <div class="box">
+        <p>
+            <span class="dht-labels">PM2.5:</span>
+            <span id="pm2p5">%PM2P5%</span>
+        </p>
+    </div>
+    <div class="box">
+        <p>
+            <span class="dht-labels">PM4.0:</span>
+            <span id="pm4p0">%PM4P0%</span>
+        </p>
+    </div>
+    <div class="box">
+        <p>
+            <span class="dht-labels">PM10.0:</span>
+            <span id="pm10p0">%PM10P0%</span>
+        </p>
+    </div>
+    <div class="box">
+        <p>
+            <span class="dht-labels">CO2:</span>
+            <span id="co2">%CO2%</span>
+        </p>
+    </div>
+    <div class="box">
+        <p>
+            <span class="dht-labels">Humidity:</span>
+            <span id="ambienthumidity">%AMBIENTHUMIDITY%</span>
+        </p>
+    </div>
 
+    <div class ="box">
+        <p>
+            <span class="dht-labels">Temperature:</span>
+            <span id="ambienttemperature">%AMBIENTTEMPERATURE%</span>
+        </p>
+    </div>
+
+    <div class ="box">
+        <p>
+            <span class="dht-labels">VOC Index:</span>
+            <span id="vocindex">%VOCINDEX%</span>
+        </p>
+    </div>
+
+    <div class ="box">
+        <p>
+            <span class="dht-labels">NOx Index:</span>
+            <span id="noxindex">%NOXINDEX%</span>
+        </p>
+    </div>
+
+    <div class ="box">
+        <p>
+            <span id="serial-output">%SERIAL% </span>
+        </p>
+
+    </div>
+</div>
 <button id = "online-button"> Go Online</button>
 
 </body>
@@ -350,16 +377,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 
 // Replaces placeholder with DHT values
 String processor(const String& var){
-  //Serial.println(var);
-//  if(var == "TEMPERATURE"){
-//    return readScdTemp();
-//  }
-//  else if(var == "HUMIDITY"){
-//    return readScdHum();
-//  }
-//  else if(var == "CO2"){
-//    return readScdCo2();
-//  }
   if(var == "PM1P0"){
     return readPm1p0();
   }
@@ -436,8 +453,6 @@ scd4x.begin(Wire);
 
 scd4x.startPeriodicMeasurement();
   
-  
- 
   // Route for web page
 server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if (ON_STA_FILTER(request) || ON_AP_FILTER(request)) {
@@ -512,8 +527,6 @@ server.on("/ambienttemperature", HTTP_GET, [](AsyncWebServerRequest *request){
         return;
   }
 });
-
-
   // Serve web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
