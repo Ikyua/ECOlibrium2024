@@ -372,6 +372,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     const button = document.getElementById("online-button");
     button.addEventListener('click', function() {
+    alert('Button was clicked!');
         // When this button is clicked I want to go to wifimanager
     });
 
