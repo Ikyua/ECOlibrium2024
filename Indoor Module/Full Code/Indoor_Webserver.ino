@@ -170,7 +170,6 @@ const char index_html[] PROGMEM = R"rawliteral(
             vertical-align: middle;
             padding: 15px 15px;
         }
-
         button {
             background-color: white;
             border: none;
@@ -185,9 +184,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
         button:hover {
             background-color: lightcoral;
-        }
-        .span {
-            font-size: 100px;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -372,6 +369,12 @@ const char index_html[] PROGMEM = R"rawliteral(
         xhttp.open("GET", "/serial", true);
         xhttp.send();
     }, 5000);
+
+    const button = document.getElementById("online-button");
+    button.addEventListener('click', function() {
+        // When this button is clicked I want to go to wifimanager
+    });
+
 </script>
 </html>)rawliteral";
 
