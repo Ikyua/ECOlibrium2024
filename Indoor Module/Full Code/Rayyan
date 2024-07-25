@@ -6,6 +6,8 @@
 #include <Wire.h>
 #include <time.h>
 
+WiFiManager wm;
+
 String serialBuffer = "";
 SensirionI2CSen5x sen5x;
 SensirionI2CScd4x scd4x;
@@ -368,7 +370,7 @@ void setup(){
   printAndBuffer("4. Wait until your device indicates that it has connected to the network.");
   printAndBuffer("5. Once connected, enter the following address in a web browser: http://192.168.1.218/");
 
-  WiFiManager wm;
+
 
  // Start WiFi Manager
     bool res = wm.autoConnect("AutoConnectAP","password");
